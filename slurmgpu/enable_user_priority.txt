@@ -1,0 +1,8 @@
+TO SET THE SCHEDULING PRIORITY FOR A USER, FIRST REGISTER AN ACCOUNT:
+	sudo sacctmgr add account user1account priority=1000
+
+THEN LINK THE USER TO THE ACCOUNT:
+	sudo sacctmgr add user user1 account=user1account
+
+TO SHOW THE CREATED ASSOCIATION:
+	sacctmgr show association users=user1 format=account,user,priority

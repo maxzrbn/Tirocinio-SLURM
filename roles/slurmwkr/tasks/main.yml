@@ -1,0 +1,17 @@
+---
+- name: Copy CGroup config file
+  ansible.builtin.template:
+    src: 'cgroup.conf'
+    dest: '/etc/slurm/cgroup.conf'
+    mode: '0644'
+
+- name: Install Slurm compute node package
+  ansible.builtin.apt:
+    name: 'slurmd'
+    update_cache: true
+
+- name: Enable and restart Slurmd
+  ansible.builtin.service:
+    name: 'slurmd'
+    enabled: true
+    state: restarted

@@ -1,0 +1,100 @@
+---
+- name: Install Munge packages
+  ansible.builtin.apt:
+    name: ['libmunge-dev','libmunge2','munge']
+
+- name: Stop Munge to permit user modification
+  ansible.builtin.service:
+    name: 'munge'
+    state: stopped
+
+- name: Ensure 'munge' group is present
+  ansible.builtin.group:
+    name: 'munge'
+    state: present
+    gid: '1005'
+
+- name: Ensure 'munge' user is present
+  ansible.builtin.user:
+    name: 'munge'
+    uid: '1005'
+    group: 'munge'
+    home: '/var/run/munge'
+    shell: '/sbin/nologin'
+
+- name: Change Munge log ownership
+  ansible.builtin.file:
+    path: '/var/log/munge'
+    state: 'directory'
+    recurse: true
+    owner: 'munge'
+    group: 'munge'
+
+- name: Change Munge seed ownership
+  ansible.builtin.file:
+    path: '/var/lib/munge'
+    state: 'directory'
+    recurse: true
+    owner: 'munge'
+    group: 'munge'
+
+- name: Change Munge key folder ownership
+  ansible.builtin.file:
+    path: '/etc/munge'
+    state: 'directory'
+    recurse: true
+    owner: 'munge'
+    group: 'munge'
+
+- name: Copy Munge key
+  ansible.builtin.template:
+    src: 'munge.key'
+    dest: '/etc/munge/munge.key'
+    owner: 'munge'
+    group: 'munge'
+    mode: '0400'
+
+- name: Start Munge
+  ansible.builtin.service:
+    name: 'munge'
+    state: started
+
+- name: Install PMIx binaries (SLURM dep)
+  ansible.builtin.apt:
+    name: 'libpmix-bin'
+
+- name: Ensure group 'slurm' exists
+  ansible.builtin.group:
+    name: 'slurm'
+    state: present
+    gid: '64030'
+
+- name: Ensure user 'slurm' exists
+  ansible.builtin.user:
+    name: 'slurm'
+    uid: '64030'
+    group: 'slurm'
+    home: '/var/slurm'
+    shell: '/sbin/nologin'
+
+- name: Create '/var/slurm' directory
+  ansible.builtin.file:
+    path: '/var/slurm'
+    owner: 'slurm'
+    group: 'slurm'
+    mode: '0755'
+    state: directory
+
+- name: Create '/etc/slurm' directory
+  ansible.builtin.file:
+    path: '/etc/slurm'
+    owner: 'slurm'
+    group: 'slurm'
+    mode: '0755'
+    state: directory
+
+- name: Copy Slurm configuration file
+  ansible.builtin.template:
+    src: slurm.conf
+    dest: '/etc/slurm/slurm.conf'
+    mode: '0644'

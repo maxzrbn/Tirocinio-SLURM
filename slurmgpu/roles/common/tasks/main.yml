@@ -1,0 +1,37 @@
+---
+- name: Update all packages
+  ansible.builtin.apt:
+    update_cache: true
+
+- name: Install NTP
+  ansible.builtin.apt:
+    name: 'ntp'
+
+- name: Enable and restart NTP
+  ansible.builtin.service:
+    name: 'ntp'
+    enabled: true
+    state: restarted
+
+- name: Ensure test groups exist
+  ansible.builtin.group:
+    name: "{{ item.name }}"
+    gid: "{{ item.id }}"
+    state: present
+  loop:
+    - { name: 'user1', id: '2001' }
+    - { name: 'user2', id: '2002' }
+    - { name: 'user3', id: '2003' }
+    - { name: 'user4', id: '2004' }
+
+- name: Ensure test users exist
+  ansible.builtin.user:
+    name: "{{ item.name }}"
+    uid: "{{ item.id }}"
+    group: "{{ item.name }}"
+    state: present
+  loop:
+    - { name: 'user1', id: '2001' }
+    - { name: 'user2', id: '2002' }
+    - { name: 'user3', id: '2003' }
+    - { name: 'user4', id: '2004' }

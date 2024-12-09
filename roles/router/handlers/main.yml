@@ -1,0 +1,8 @@
+---
+- name: Restart Networking
+  ansible.builtin.service:
+    name: 'networking'
+    state: restarted
+
+- name: Reload kernel config
+  ansible.builtin.command: /usr/sbin/sysctl -p

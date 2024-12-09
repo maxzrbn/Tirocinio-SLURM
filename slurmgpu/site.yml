@@ -1,0 +1,15 @@
+---
+- hosts: testSlurm
+  become: true
+  roles:
+    - common
+    - mariadb
+    - slurmcommon
+    - slurmctlr
+
+- hosts: testSlurmGPU1
+  become: true
+  roles:
+    - common
+    - slurmcommon
+    - slurmwkr

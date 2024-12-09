@@ -1,0 +1,116 @@
+---
+- name: Include secrets variables
+  ansible.builtin.include_vars: secrets.yml
+
+- name: Install podman package
+  ansible.builtin.apt:
+    name: ['podman', 'containers-storage', 'acl', 'python3-mysqldb', 'mariadb-client', 'python3-pymysql']
+    update_cache: true
+    install_recommends: true
+
+- name: Create MariaDB group if is not present
+  ansible.builtin.group:
+    name: 'mariadb'
+    state: present
+
+- name: Create 'mariadb' user
+  ansible.builtin.user:
+    name: 'mariadb'
+    group: 'mariadb'
+    home: '/home/mariadb'
+    shell: '/sbin/nologin'
+
+- name: Allow lingering for 'mariadb'
+  ansible.builtin.command: loginctl enable-linger "mariadb"
+
+- name: Configure docker.io registry
+  ansible.builtin.lineinfile:
+    path: /etc/containers/registries.conf
+    regexp: '^# unqualified-search-registries ='
+    line: 'unqualified-search-registries = ["docker.io"]'
+
+- name: Pull a MariaDB container
+  become: true
+  become_user: 'mariadb'
+  containers.podman.podman_image:
+    name: 'mariadb:latest'
+
+- name: Run MariaDB container
+  become: true
+  become_user: 'mariadb'
+  containers.podman.podman_container:
+    name: 'mariadb'
+    image: 'mariadb:latest'
+    state: started
+    ports: "127.0.0.1:3306:3306"
+    env:
+        MARIADB_ROOT_PASSWORD: "{{ mariadb.root_password }}"
+
+- name: Ensure 'slurm_db' database is present
+  community.mysql.mysql_db:
+    name: slurm_db
+    state: present
+    login_host: 127.0.0.1
+    login_port: 3306
+    login_user: root
+    login_password: "{{ mariadb.root_password }}"
+  retries: 6
+  delay: 10
+
+# NOTE: wildcard '%' (any host) as host for 'slurm' is necessary to connect via
+# TCP/IP ports
+- name: Ensure 'slurm' MySQL user is present with password
+  community.mysql.mysql_user:
+    name: slurm
+    password: "{{ mariadb.slurm_password }}"
+    host: '%'
+    login_host: 127.0.0.1
+    login_user: root
+    login_password: "{{ mariadb.root_password }}"
+    state: present
+
+- name: Grant usage privilege to the user
+  community.mysql.mysql_user:
+    name: slurm
+    priv: '*.*:USAGE'
+    append_privs: yes
+    host: '%'
+    login_host: 127.0.0.1
+    login_user: root
+    login_password: "{{ mariadb.root_password }}"
+    state: present
+
+- name: Grant all privileges on the database to the user
+  community.mysql.mysql_user:
+    name: slurm
+    priv: 'slurm_db.*:ALL'
+    append_privs: yes
+    host: '%'
+    login_host: 127.0.0.1
+    login_user: root
+    login_password: "{{ mariadb.root_password }}"
+    state: present
+
+- name: Flush privileges (update & reload grant tables)
+  community.mysql.mysql_user:
+    login_user: root
+    login_password: "{{ mariadb.root_password }}"
+    check_implicit_admin: yes
+    append_privs: yes
+    login_host: 127.0.0.1
+    state: present
+    name: slurm
+    host: '%'
+
+- name: Install 'slurmdb' package
+  ansible.builtin.apt:
+    name: 'slurmdbd'
+    update_cache: true
+
+- name: Copy slurmdb config file 
+  ansible.builtin.template:
+    src: 'slurmdbd.conf'
+    dest: '/etc/slurm/slurmdbd.conf'
+    mode: '0600'
+    owner: 'slurm'
+    group: 'slurm'

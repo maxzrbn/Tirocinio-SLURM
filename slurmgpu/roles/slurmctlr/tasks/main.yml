@@ -1,0 +1,29 @@
+---
+- name: Install Slurm packages
+  ansible.builtin.apt:
+    name: ['slurm-client','slurmctld','slurm-wlm-doc']
+    update_cache: true
+
+- name: Enable and restart Munge
+  ansible.builtin.service:
+    name: 'munge'
+    enabled: true
+    state: restarted
+
+- name: Check if 'slurmdbd' is present
+  ansible.builtin.stat:
+    path: '/etc/init.d/slurmdbd'
+  register: slurmdbd_stat
+
+- name: Enable and restart 'slurmbdb' if present
+  ansible.builtin.service:
+    name: 'slurmdbd'
+    enabled: true
+    state: restarted
+  when: slurmdbd_stat.stat.exists
+
+- name: Enable and restart 'slurmctld'
+  ansible.builtin.service:
+    name: 'slurmctld'
+    enabled: true
+    state: restarted

@@ -1,0 +1,39 @@
+---
+- hosts: router
+  become: true
+  roles:
+    - common
+    - router
+
+- hosts: controller1
+  become: true
+  roles:
+    - common
+    - mariadb
+    - slurmcommon
+    - cluster1
+    - slurmctlr
+
+- hosts: controller2
+  become: true
+  roles:
+    - common
+    - slurmcommon
+    - cluster2
+    - slurmctlr
+
+- hosts: slurm1-1:slurm1-2
+  become: true
+  roles:
+    - common
+    - slurmcommon
+    - cluster1
+    - slurmwkr
+
+- hosts: slurm2-1:slurm2-2
+  become: true
+  roles:
+    - common
+    - slurmcommon
+    - cluster2
+    - slurmwkr

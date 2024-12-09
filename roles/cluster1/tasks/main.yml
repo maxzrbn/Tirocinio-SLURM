@@ -1,0 +1,6 @@
+---
+- name: Copy Slurm configuration file
+  ansible.builtin.template:
+    src: slurm.conf
+    dest: '/etc/slurm/slurm.conf'
+    mode: '0644'

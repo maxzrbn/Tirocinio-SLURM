@@ -1,0 +1,6 @@
+TO REGISTER THE FEDERATION, RUN ON A CONTROLLER:
+	sudo sacctmgr add federation testfederation clusters=cluster1,cluster2
+
+TO CHECK THAT IT'S WORKING:
+	sacctmgr show federation
+	scontrol show federation

@@ -1,0 +1,22 @@
+---
+- name: Update all packages
+  ansible.builtin.apt:
+    update_cache: true
+
+- name: Change 'allow-hotplug' to 'auto'
+  ansible.builtin.replace:
+    path: '/etc/network/interfaces'
+    regexp: '^allow\-hotplug'
+    replace: 'auto'
+    validate: /usr/sbin/ifup --no-act -i %s eth0
+  notify: Restart Networking
+
+- name: Install NTP
+  ansible.builtin.apt:
+    name: 'ntp'
+
+- name: Enable and restart NTP
+  ansible.builtin.service:
+    name: 'ntp'
+    enabled: true
+    state: restarted
