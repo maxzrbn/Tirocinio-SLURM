@@ -531,7 +531,7 @@ PARTITION CLUSTER  AVAIL  TIMELIMIT  NODES  STATE NODELIST
 debug*    cluster1    up   infinite      1   idle slurm1-[1-2]
 debug*    cluster2    up   infinite      1   idle slurm2-[1-2]
 \end{minted}
-Grazie all'opzione \texttt{{-}{-}clusters} in fase di sottomissione, è possibile specificare una lista di cluster sul quale tentare di eseguire il job richiesto:
+Grazie all'opzione \texttt{{-}{-}clusters} in fase di sottomissione, è possibile specificare una lista di cluster sulla quale tentare di eseguire il job richiesto:
 \begin{minted}{console}
 vagrant@controller1:~$ srun --clusters=cluster2 -N2 hostname
 slurm2-1
@@ -564,7 +564,7 @@ In particolare, le seguenti opzioni specificano:
     \item \mintinline{properties}{AccountingStorageTRES=gres/gpu}: registrazione dell'attività delle \ac{GPU};
     \item \mintinline{properties}{GresTypes=gpu}: tipi di \ac{GRES} da condividere;
     \item \mintinline{properties}{RealMemory=1024}: memoria totale (in \ac{MB}) allocabile per nodo worker (opzione obbligatoria per la condivisione della memoria; deve essere minore o uguale alla \ac{RAM} riconosciuta dal sistema operativo);
-    \item \mintinline{properties}{Gres=gpu:rtx2080ti:2}: Specifiche \ac{GRES} presenti nel nodo (in questo caso, due \ac{GPU}).
+    \item \mintinline{properties}{Gres=gpu:rtx2080ti:2}: specifiche \ac{GRES} presenti nel nodo (in questo caso, due \ac{GPU}).
 \end{itemize}
 È stato poi necessario introdurre nel nodo \texttt{worker} due ulteriori file di configurazione, per l'interfacciamento con le risorse presenti:
 \begin{minted}[label=cgroup.conf]{properties}
@@ -767,7 +767,7 @@ JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
 
 
 \chapter{\textbf{Conclusioni}} % ==================================================
-L'esperienza di tirocinio presso \acf{ULISSE} è iniziata con lo studio e l'approfondimento autonomo degli strumenti chiave interessati (in particolare \ac{SLURM}), al termine del quale ho chiarito gli obiettivi posti dall'attività.
+L'esperienza di tirocinio presso \acf{ULISSE} è iniziata con lo studio e l'approfondimento autonomo degli strumenti chiave interessati (in particolare \acf{SLURM}), al termine del quale ho chiarito gli obiettivi posti dall'attività.
 
 Successivamente ho dovuto integrare l'ambiente personale di lavoro con le tecnologie essenziali allo sviluppo del progetto. È stato dunque necessario:
 \begin{itemize}
