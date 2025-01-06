@@ -1,4 +1,4 @@
-### Attività di tirocinio presso [ULISSE](https://ulisse.unibo.it/)
+## Attività di tirocinio presso [ULISSE](https://ulisse.unibo.it/)
 
 Infrastruttura virtuale sviluppata per l'integrazione di funzionalità [SLURM](https://slurm.schedmd.com/overview.html).
 
